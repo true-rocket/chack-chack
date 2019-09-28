@@ -5,7 +5,6 @@ var list = new List();
 
 router.get('/:id', function (req, res) {
     list.readById(req.params.id).then(res => console.log(res));
-    list.readById(req.params.id).then(res => console.log(res));
 });
 
 module.exports = router;
