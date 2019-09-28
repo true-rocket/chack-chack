@@ -23,10 +23,14 @@ async function query(sql, params, callback) {
     } finally {
       client.release()
       await pool.end()
-      var res = result && result.rows ? result.rows : (result || 'no response')
+      var res = result && result.rows ? result.rows : ('no response')
       return JSON.stringify(res)
     }
-  })().catch(e => console.error(e.message, e.stack))
+  })()
+  .catch(e => {
+    console.error(e.message, e.stack)
+    return 'error'
+  })
   // console.log(res)
   return res;
 };
@@ -75,38 +79,56 @@ async function query(sql, params, callback) {
     //
     // });
 
+async function login(usr, pwd) {
+    var logined = false;
+    var res = await query('select * from users where user = ' + usr + ' and password = ' + pwd, []);
+    if (res != 'no response') { logined = true };
+    console.log(logined);
+    return logined;
+}
+
+async function regUser(usr, pwd) {
+    var registered = await query('select * from users where user = ' + usr, [])
+      .then(async (resp) => {
+        if (resp == 'no response') {
+          var res = await query('insert into users (user, password) values (\'' + usr + '\',\'' + pwd + '\')', []);
+          if (res != 'error') {
+            return true
+          } else {
+            return false
+          }
+        } else {
+          return false
+        }
+    })
+    console.log(registered);
+    return registered;
+}
 
 async function create(table, ...args) {
     switch (table) {
       case 'types':
-        // console.log('insert into ' + table + ' (name, nameru) values (' + [arguments[1], arguments[2]] + ')')
         var res = await query('insert into ' + table + ' (name, nameru) values (\'' + arguments[1] + '\',\'' + arguments[2] + '\')', []);
         break;
-
       case 'cells':
         var res = await query('insert into ' + table + ' (name, nameru, descr, type, text) values (\'' + arguments[1] + '\',\'' + arguments[2] + '\',\'' + arguments[3] + '\',\'' + arguments[4] + '\',\'' + arguments[5] + '\')', []);
         break;
-
       case 'forms':
         var res = await query('insert into ' + table + ' (name, nameru, descr, timelimit, required, num) values (\'' + arguments[1] + '\',\'' + arguments[2] + '\',\'' + arguments[3] + '\',\'' + arguments[4] + '\',\'' + arguments[5] + '\',\'' + arguments[6] + '\')', []);
         break;
-
+      case 'vforms_cells':
+        var res = await query('insert into ' + table + ' (form_id, cell_id, name, nameru, descr, type, text, required, num, grouping, page) values (\'' + arguments[1] + '\',\'' + arguments[2] + '\',\'' + arguments[3] + '\',\'' + arguments[4] + '\',\'' + arguments[5]+ '\',\'' + arguments[6]+ '\',\'' + arguments[7]+ '\',\'' + arguments[8]+ '\',\'' + arguments[9]+ '\',\'' + arguments[10]+ '\',\'' + arguments[11] + '\')', []);
+        break;
       default:
         console.log(table)
         var res = null;
         break;
     }
-
-    // var res = query('insert into ' + table + ' (name, sys_name) values ($1, $2)', [item.name, item.sys_name]);
-    // console.log(res);
     return res;
 }
 
 async function read(table) {
     var res = await query('select * from ' + table, []);
-      // , function (err, result) {
-        // callback(err, result);
-    // });
     console.log(res);
     return res;
 }
@@ -122,21 +144,20 @@ async function update(table, id, ...args) {
     case 'types':
       var res = await query('update ' + table + ' set name = \'' + arguments[2] + '\', nameru = \''  + arguments[3] + '\' where id = ' + id, []);
       break;
-
     case 'cells':
       var res = await query('update ' + table + ' set name = \'' + arguments[2] + '\', nameru = \''  + arguments[3] + '\', descr = ' + arguments[4] + '\', type = ' + arguments[5] + '\', text = ' + arguments[6] + ' where id = ' + id, []);
       break;
-
     case 'forms':
       var res = await query('update ' + table + ' set name = \'' + arguments[2] + '\', nameru = \''  + arguments[3] + '\', descr = ' + arguments[4] + '\', timelimit = ' + arguments[5] + '\', required = ' + arguments[6] + '\', num = ' + arguments[7] + ' where id = ' + id, []);
       break;
-
+    case 'vforms_cells':
+      var res = await query('update ' + table + ' set form_id = \'' + arguments[2] + '\', cell_id = \'' + arguments[3] + '\', name = \'' + arguments[4] + '\', nameru = \''  + arguments[5] + '\', descr = ' + arguments[6] + '\', type = ' + arguments[7] + '\', text = ' + arguments[8] + '\', required = ' + arguments[9] + '\', num = ' + arguments[10] + '\', grouping = ' + arguments[11] + '\', page = ' + arguments[12] + ' where id = ' + id, []);
+      break;
     default:
       console.log(table)
       var res = null;
       break;
   }
-
   return res;
 }
 
