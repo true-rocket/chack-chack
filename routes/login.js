@@ -11,7 +11,7 @@ router.get('/login/:user/:password', function (req, res) {
 //   list.readById(req.params.user).then(res => console.log(res));
 // });
 //
-// router.get('/upd/:id/:name/:nameru', function (req, res) {
+// router.get('/upd/get/:id/:name/:nameru', function (req, res) {
 //   console.log(req.params);
 //   list.update('types', req.params.id, req.params.name, req.params.nameru).then(res => console.log(res));
 // });

@@ -7,16 +7,16 @@ router.get('/read/all', function (req, res) {
     list.read('vforms_cells').then(res => console.log(res));
 });
 
-router.get('/:id', function (req, res) {
+router.get('/get/:id', function (req, res) {
     list.readById('vforms_cells', req.params.id).then(res => console.log(res));
 });
 
-router.get('/del/:id', function (req, res) {
+router.get('/del/get/:id', function (req, res) {
   console.log(req.params);
   list.del('vforms_cells', req.params.id).then(res => console.log(res));
 });
 
-router.get('/upd/:id/:name/:nameru/:descr/:type/:text/:required/:num/:grouping/:page', function (req, res) {
+router.get('/upd/get/:id/:name/:nameru/:descr/:type/:text/:required/:num/:grouping/:page', function (req, res) {
   console.log(req.params);
   list.update('vforms_cells', req.params.id, req.params.name, req.params.nameru, req.params.descr, req.params.type, req.params.text, req.params.required, req.params.num, req.params.grouping, req.params.page).then(res => console.log(res));
 });
